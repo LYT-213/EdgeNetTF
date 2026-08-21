@@ -1,0 +1,4 @@
+Comparison,Wilcoxon_W,Raw_p,Mean_difference_percentage_points
+EdgeNetTF vs Temporal-only,13.0,1.6007106751203537e-10,2.590760265108627
+EdgeNetTF vs FFT-only,320.0,0.23173732552095316,0.31066113616246005
+EdgeNetTF vs EdgeNetTF-Gated,356.0,0.47620780297620513,0.08477210097646015
