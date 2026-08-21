@@ -1,0 +1,15 @@
+Python: 3.12.13
+PyTorch: 2.10.0+cu128
+CUDA available: True
+CUDA runtime reported by PyTorch: 12.8
+GPU: Tesla T4
+CPU architecture reported by Python: x86_64
+CPU threads used for profiling: 1
+Warm-up iterations: 100
+Timed iterations: 1000
+Batch size: 1
+Temporal input shape: (1, 12, 600)
+Frequency input shape for EdgeNetTF: (1, 12, 300)
+Latency scope: model forward pass only
+Excluded from latency: data loading, window generation, preprocessing, FFT
+FLOPs convention: 2 x MACs
