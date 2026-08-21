@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the associated EdgeNetTF manuscript."
+title: "EdgeNetTF for Lightweight Time Frequency Representation Learning in Multiclass sEMG Hand Gesture Recognition"
+type: software
+authors:
+  - family-names: Li
+    given-names: Yutao
+  - family-names: Kim
+    given-names: Junghun
+  - family-names: Choi
+    given-names: Sang-Il
+repository-code: "https://github.com/LYT-213/EdgeNetTF"
