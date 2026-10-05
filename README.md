@@ -1,5 +1,7 @@
 # EdgeNetTF
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23155437.svg)](https://doi.org/10.5281/zenodo.23155437)
+
 Official reproducibility repository for **EdgeNetTF for Lightweight Time Frequency Representation Learning in Multiclass sEMG Hand Gesture Recognition**.
 
 Yutao Li, Junghun Kim, and Sang-Il Choi — Daegu Catholic University, Republic of Korea.
@@ -167,7 +169,7 @@ See `results/revision/README.md` for the revision result files.
 
 ## Citation
 
-Publication details and the archived repository DOI will be added when available. Until then:
+Archived software release (v1.0.0): **https://doi.org/10.5281/zenodo.23155437**
 
 > Y. Li, J. Kim, and S.-I. Choi, "EdgeNetTF for Lightweight Time Frequency Representation Learning in Multiclass sEMG Hand Gesture Recognition."
 
