@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Recompute manuscript summary values from the subject-level CSV files.
 
-The manuscript summary tables use population standard deviation (ddof=0),
-matching the original experiment summary code.
+The revised manuscript and Supplementary Information report sample standard
+deviation (ddof=1) across subjects.
 """
 
 from pathlib import Path
@@ -15,7 +15,7 @@ RESULTS = ROOT / "results"
 
 def summarize(values):
     values = np.asarray(values, dtype=float)
-    return values.mean() * 100.0, values.std(ddof=0) * 100.0
+    return values.mean() * 100.0, values.std(ddof=1) * 100.0
 
 
 def main():
