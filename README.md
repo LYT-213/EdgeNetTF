@@ -9,104 +9,90 @@ Daegu Catholic University, Republic of Korea
 
 ## Overview
 
-EdgeNetTF is a lightweight dual-branch one-dimensional neural network for surface electromyography (sEMG) hand gesture recognition. It combines a temporal representation with a fast Fourier transform (FFT)-based spectral representation and fuses the two 128-dimensional branch outputs by direct concatenation.
+EdgeNetTF is a lightweight dual-branch one-dimensional neural network for surface electromyography (sEMG) hand gesture recognition. It combines a temporal representation with a fast Fourier transform (FFT)-based spectral representation and fuses two 128-dimensional branch outputs by direct concatenation.
 
-The manuscript evaluates EdgeNetTF on **NinaPro DB2** using:
+The primary evaluation uses **NinaPro DB2** with 40 intact subjects and 49 non-rest gestures. Repetitions **1, 3, 4, and 6** are used for training and repetitions **2 and 5** for testing. The split is performed before sliding-window segmentation. The final model contains approximately **0.1891 M trainable parameters**.
 
-- 40 intact subjects
-- 49 non-rest gestures
-- training repetitions: **1, 3, 4, 6**
-- test repetitions: **2, 5**
-- 600-sample windows
-- training stride: 60 samples
-- test stride: 600 samples
-- subject-specific standardization using training windows only
-- Causal5 majority voting for the controlled within-study evaluation
-
-The final concatenation-based EdgeNetTF contains approximately **0.1891 M trainable parameters**.
+The Scientific Reports major revision additionally includes leakage-free DB2 leave-one-subject-out (LOSO) evaluation, external validation on NinaPro DB3, kernel/channel sensitivity analysis, FFT-window sensitivity analysis, UMAP feature visualization, gesture-level sample statistics, and end-to-end CPU latency profiling.
 
 ## Repository structure
 
 ```text
 EdgeNetTF/
 ├── README.md
+├── CITATION.cff
 ├── requirements.txt
-├── .gitignore
-├── src/
-│   └── edgenettf/
-│       ├── __init__.py
-│       ├── models.py
-│       ├── baselines.py
-│       ├── preprocessing.py
-│       └── smoothing.py
+├── src/edgenettf/
+│   ├── models.py
+│   ├── baselines.py
+│   ├── preprocessing.py
+│   └── smoothing.py
 ├── scripts/
 │   ├── statistics.py
 │   ├── reproduce_summary_tables.py
-│   └── profile_table4.py
+│   ├── profile_table4.py
+│   └── revision/
+│       ├── run_loso_db2.py
+│       ├── run_db3_external_validation.py
+│       ├── run_hyperparameter_sensitivity.py
+│       ├── run_fft_window_sensitivity.py
+│       ├── statistics_revision.py
+│       ├── generate_umap_s1.py
+│       ├── generate_gesture_statistics.py
+│       ├── generate_time_fft_figure.py
+│       └── profile_end_to_end_latency.py
 └── results/
     ├── ablation_subject_level.csv
     ├── baseline_subject_level.csv
     ├── table1_ablation_summary.csv
     ├── table2_baseline_summary.csv
     ├── table4_computational_efficiency.csv
-    ├── table4_environment.txt
     ├── wilcoxon_ablation.csv
-    └── wilcoxon_baselines_holm.csv
+    ├── wilcoxon_baselines_holm.csv
+    └── revision/
+        ├── hyperparameter_summary.csv
+        ├── hyperparameter_statistics.csv
+        ├── fft_window_summary.csv
+        ├── fft_window_statistics.csv
+        ├── loso_subject_level.csv
+        ├── loso_summary.csv
+        ├── db3_subject_level.csv
+        ├── db3_summary.csv
+        └── end_to_end_latency_summary.csv
 ```
 
 ## Data
 
-The raw NinaPro DB2 data are **not redistributed in this repository**. Please obtain DB2 from the official NinaPro resource or another authorized source and keep the raw data outside the repository.
+Raw NinaPro data are **not redistributed**. Obtain NinaPro DB2 and DB3 from the official NinaPro resource or another authorized source and set the dataset path at the top of the relevant experiment script.
 
-## Preprocessing
+## Primary DB2 protocol
 
-The experiments use logarithmic amplitude compression:
+- subjects: 40
+- active gesture classes: 49 (rest excluded)
+- sampling rate: 2 kHz
+- window length: 600 samples (300 ms)
+- train repetitions: 1, 3, 4, 6
+- test repetitions: 2, 5
+- train stride: 60 samples (30 ms)
+- test stride: 600 samples (300 ms)
+- windows never cross gesture or repetition boundaries
+- temporal and frequency inputs are standardized independently using training-window statistics only
+
+The logarithmic amplitude compression is:
 
 ```python
 sign(x) * log(1 + 2048 * abs(x)) / log(2049)
 ```
 
-Windows are generated only inside continuous, single-label gesture segments so that no window crosses a gesture boundary.
-
-For each temporal window, the spectral branch uses the first half of the FFT magnitude spectrum:
+The original spectral representation is a direct FFT without explicit tapering (rectangular-window equivalent):
 
 ```python
 log1p(abs(fft(window))[:window_size // 2] + 1e-8)
 ```
 
-Temporal and frequency-domain inputs are standardized independently using statistics computed from the corresponding subject's **training windows only**.
-
-## EdgeNetTF architecture
-
-The temporal branch uses two Conv1D blocks with 64 and 128 channels, batch normalization, GELU activation, max pooling, and adaptive average pooling.
-
-The frequency branch uses Conv1D layers with 64 and 128 channels, batch normalization, GELU activation, and adaptive average pooling.
-
-The two 128-dimensional feature vectors are concatenated into a 256-dimensional representation and passed to the classifier:
-
-```text
-256 -> 256 -> 49 classes
-```
-
-The final manuscript model is the **direct-concatenation EdgeNetTF** implemented in `src/edgenettf/models.py`. `EdgeNetTFGated` in the same file is the adaptive gated-fusion ablation.
-
-## Controlled baseline models
-
-`src/edgenettf/baselines.py` contains the one-dimensional implementations used for the controlled comparisons:
-
-- CNN1D
-- MobileNetV2_1D
-- SqueezeNet1D
-- ShuffleNetV2_1D
-- ResNet1D
-- DenseNet1D
-- InceptionTime1D
-
-The parameter counts of these implementations match the models reported in the manuscript tables.
+For a 600-sample window, the temporal input is `12 x 600` and the frequency input is `12 x 300`.
 
 ## Training configuration
-
-The final experiments used:
 
 - optimizer: AdamW
 - initial learning rate: 0.001
@@ -120,15 +106,66 @@ The final experiments used:
 - scheduler: CosineAnnealingWarmRestarts (`T_0=20`, `T_mult=2`)
 - gradient clipping: 1.0
 
-Individual original experiment runs used their experiment-specific random seeds.
+Causal5 majority voting uses the current prediction and up to four preceding predictions inside each dataset-defined gesture segment; future predictions are never used.
 
-## Causal5 smoothing
+## Controlled models and ablations
 
-Causal5 uses the current prediction and up to four immediately preceding predictions. It does not use future predictions.
+`src/edgenettf/models.py` contains the final concatenation-based EdgeNetTF plus the Temporal-only, FFT-only, and gated-fusion ablations. `src/edgenettf/baselines.py` contains the one-dimensional controlled baselines:
 
-In the reported experiments, smoothing is applied independently inside dataset-defined gesture segments. It should not be interpreted as a complete continuous-stream gesture-transition detector.
+- CNN1D
+- MobileNetV2_1D
+- SqueezeNet1D
+- ShuffleNetV2_1D
+- ResNet1D
+- DenseNet1D
+- InceptionTime1D
 
-## Reproducing the statistical analysis
+## Major-revision analyses
+
+### Hyperparameter sensitivity
+
+```bash
+python scripts/revision/run_hyperparameter_sensitivity.py
+```
+
+Tests smaller/larger convolution kernels and narrower/wider channel configurations while retaining the primary DB2 protocol. Summary values and Holm-adjusted paired statistics are in `results/revision/`.
+
+### FFT-window sensitivity
+
+```bash
+python scripts/revision/run_fft_window_sensitivity.py
+```
+
+Runs Hann and Hamming tapering under the same protocol. The original direct FFT results are the reference condition. Explicit tapering did not improve the reported recognition performance.
+
+### Leakage-free LOSO evaluation
+
+```bash
+python scripts/revision/run_loso_db2.py --start 1 --end 40
+```
+
+Each fold completely holds out one DB2 participant; the remaining 39 subjects are used for training. The held-out participant contributes neither training windows nor normalization statistics. For computational feasibility, both training and testing use non-overlapping 600-sample windows (stride 600).
+
+### NinaPro DB3 validation
+
+```bash
+python scripts/revision/run_db3_external_validation.py
+```
+
+Evaluates 11 trans-radial amputee participants using repetitions 1/3/4/6 for training and 2/5 for testing. The number of available active gesture classes varies from 38 to 49 across participants.
+
+### Feature visualization and supporting analyses
+
+```bash
+python scripts/revision/generate_umap_s1.py
+python scripts/revision/generate_gesture_statistics.py
+python scripts/revision/generate_time_fft_figure.py
+python scripts/revision/profile_end_to_end_latency.py
+```
+
+The UMAP visualization uses independently projected temporal, frequency-domain, and fused held-out S1 features with `n_neighbors=30`, `min_dist=0.1`, Euclidean distance, and `random_state=42`.
+
+## Statistical analysis
 
 Install dependencies:
 
@@ -136,60 +173,64 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run:
+Primary ablation/baseline statistics:
 
 ```bash
 python scripts/statistics.py
 ```
 
-The script performs two-sided paired Wilcoxon signed-rank tests using subject-level Causal5 macro-F1 values. Comparisons between EdgeNetTF and the seven controlled baseline models are adjusted using the Holm method.
+Revision sensitivity statistics after generating the subject-level sensitivity CSVs:
 
-To recompute the manuscript summary means and standard deviations:
+```bash
+python scripts/revision/statistics_revision.py
+```
+
+Paired two-sided Wilcoxon signed-rank tests are performed at the subject level and Holm correction is applied within each specified comparison family. The revised manuscript and Supplementary Information report **sample standard deviations (`ddof=1`)**.
+
+To recompute the main summary tables from subject-level CSVs:
 
 ```bash
 python scripts/reproduce_summary_tables.py
 ```
 
-The manuscript summary standard deviations use `ddof=0`, matching the original experiment summary convention.
-
 ## Computational profiling
 
-Run:
+Model-only Table 4 profiling:
 
 ```bash
 python scripts/profile_table4.py
 ```
 
-The Table 4 profiling protocol uses:
+The profiling protocol uses batch size 1, temporal input `(1, 12, 600)`, frequency input `(1, 12, 300)`, 100 warm-up iterations, 1,000 timed iterations, and FLOPs approximated as `2 x MACs`.
 
-- batch size: 1
-- temporal input: `(1, 12, 600)`
-- frequency input for EdgeNetTF: `(1, 12, 300)`
-- 100 warm-up iterations
-- 1,000 timed iterations
-- one CPU thread for CPU profiling
-- CUDA events for GPU profiling
-- forward-pass latency only
-- data loading, window generation, preprocessing, and FFT excluded
-- FLOPs reported as `2 x MACs`
-
-The final reported rerun was performed in Kaggle with Python 3.12.13, PyTorch 2.10.0+cu128, CUDA 12.8, and an NVIDIA Tesla T4 GPU. The reported values are stored in `results/table4_computational_efficiency.csv`.
+The revised manuscript additionally reports end-to-end CPU latency including logarithmic compression, FFT computation, normalization, tensor conversion, and model inference. The measured pipeline latency was **2.032 ± 0.141 ms** per 300-ms window (median 2.013 ms; P95 2.255 ms) in the reported Kaggle CPU environment.
 
 ## Main reported results
 
-For the final concatenation-based EdgeNetTF across 40 subjects:
+Primary within-subject DB2 protocol:
 
-- Causal5 accuracy: approximately **87.02%**
-- Causal5 macro-F1: approximately **87.41%**
+- Causal5 accuracy: **87.01 ± 4.30%**
+- Causal5 macro-F1: **87.41 ± 3.94%**
 - parameters: **0.1891 M**
 - MACs: **35.00 M**
 - FLOPs: **70.01 M**
 
-Subject-level Causal5 macro-F1 values are included for all ablation variants and all seven controlled baseline models so that the reported summary values and paired statistical tests can be independently recomputed.
+Complementary LOSO DB2 evaluation:
+
+- Raw accuracy: **14.93 ± 5.19%**
+- Raw macro-F1: **14.11 ± 5.37%**
+- Causal5 accuracy: **16.82 ± 6.24%**
+- Causal5 macro-F1: **15.66 ± 6.34%**
+
+NinaPro DB3 external validation:
+
+- Raw accuracy: **57.16 ± 18.15%**
+- Causal5 accuracy: **64.35 ± 20.18%**
+- Causal5 macro-F1: **63.65 ± 20.15%**
 
 ## Citation
 
-Publication details will be added after publication. For now, please cite the manuscript title:
+Publication details and the archived repository DOI will be added when available. Until then, please cite the manuscript title:
 
 > Y. Li, J. Kim, and S.-I. Choi, "EdgeNetTF for Lightweight Time Frequency Representation Learning in Multiclass sEMG Hand Gesture Recognition."
 
