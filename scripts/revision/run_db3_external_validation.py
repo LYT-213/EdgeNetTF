@@ -65,8 +65,8 @@ def remap(ytr,yte):
 
 def run_subject(sid):
     seed_all(4000+sid); emg,lab,rep=load_subject(sid)
-    xtr_t,xtr_f,ytr,_=create_segmented_windows(emg,lab,rep,TRAIN_REPS,WINDOW_SIZE,TRAIN_STRIDE,1,99)
-    xte_t,xte_f,yte,seg=create_segmented_windows(emg,lab,rep,TEST_REPS,WINDOW_SIZE,TEST_STRIDE,1,99)
+    xtr_t,xtr_f,ytr,_=create_segmented_windows(emg,lab,rep,TRAIN_REPS,WINDOW_SIZE,TRAIN_STRIDE,1,49)
+    xte_t,xte_f,yte,seg=create_segmented_windows(emg,lab,rep,TEST_REPS,WINDOW_SIZE,TEST_STRIDE,1,49)
     ytr,yte,ncls=remap(ytr,yte)
     xtr_t,xte_t=std_train_test(xtr_t,xte_t); xtr_f,xte_f=std_train_test(xtr_f,xte_f)
     tr=TensorDataset(tensorize(xtr_t),tensorize(xtr_f),torch.tensor(ytr,dtype=torch.long))
