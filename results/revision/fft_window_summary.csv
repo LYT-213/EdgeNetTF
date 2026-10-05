@@ -1,0 +1,4 @@
+FFT_Window,Raw_Acc_Mean_pct,Raw_F1_Mean_pct,Causal5_Acc_Mean_pct,Causal5_F1_Mean_pct
+Direct FFT (rectangular equivalent),80.84,81.55,87.01,87.41
+Hann,79.74,80.46,86.28,86.64
+Hamming,79.93,80.64,86.56,86.89
