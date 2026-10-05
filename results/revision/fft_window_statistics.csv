@@ -1,0 +1,13 @@
+Comparison,Metric,Mean_Difference_pp,Holm_Adjusted_p,Significant
+Direct FFT vs Hann,Raw Accuracy,-1.11,3.16706e-07,True
+Direct FFT vs Hamming,Raw Accuracy,-0.91,2.924935e-09,True
+Hann vs Hamming,Raw Accuracy,0.19,0.0005112449,True
+Direct FFT vs Hann,Raw Macro-F1,-1.09,6.002665e-10,True
+Direct FFT vs Hamming,Raw Macro-F1,-0.91,9.204086e-10,True
+Hann vs Hamming,Raw Macro-F1,0.18,0.001770567,True
+Direct FFT vs Hann,Causal5 Accuracy,-0.73,4.290268e-05,True
+Direct FFT vs Hamming,Causal5 Accuracy,-0.46,0.01249157,True
+Hann vs Hamming,Causal5 Accuracy,0.27,4.290268e-05,True
+Direct FFT vs Hann,Causal5 Macro-F1,-0.77,1.611348e-05,True
+Direct FFT vs Hamming,Causal5 Macro-F1,-0.52,0.003201323,True
+Hann vs Hamming,Causal5 Macro-F1,0.26,0.0002159324,True
