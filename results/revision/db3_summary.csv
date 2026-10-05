@@ -1,0 +1,4 @@
+Metric,Mean_pct,Sample_SD_pct
+Raw Accuracy,57.16,18.15
+Causal5 Accuracy,64.35,20.18
+Causal5 Macro-F1,63.65,20.15
