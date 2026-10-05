@@ -4,6 +4,7 @@ title: "EdgeNetTF for Lightweight Time Frequency Representation Learning in Mult
 type: software
 version: 1.0.0
 date-released: 2026-10-05
+doi: 10.5281/zenodo.23155437
 authors:
   - family-names: Li
     given-names: Yutao
