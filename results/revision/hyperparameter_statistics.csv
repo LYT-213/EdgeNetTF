@@ -1,0 +1,17 @@
+Comparison,Metric,Mean_Difference_pp,Holm_Adjusted_p,Significant
+Original vs Kernel-small,Raw Accuracy,0.14,0.653789,False
+Original vs Kernel-large,Raw Accuracy,-0.09,0.653789,False
+Original vs Channel-narrow,Raw Accuracy,-0.90,8.28e-08,True
+Original vs Channel-wide,Raw Accuracy,0.41,0.00201579,True
+Original vs Kernel-small,Raw Macro-F1,0.13,0.484894,False
+Original vs Kernel-large,Raw Macro-F1,-0.09,0.571704,False
+Original vs Channel-narrow,Raw Macro-F1,-0.87,3.28e-07,True
+Original vs Channel-wide,Raw Macro-F1,0.41,0.002266,True
+Original vs Kernel-small,Causal5 Accuracy,0.02,0.977734,False
+Original vs Kernel-large,Causal5 Accuracy,-0.11,0.779986,False
+Original vs Channel-narrow,Causal5 Accuracy,-0.46,0.028333,True
+Original vs Channel-wide,Causal5 Accuracy,0.36,0.074920,False
+Original vs Kernel-small,Causal5 Macro-F1,0.00,0.910046,False
+Original vs Kernel-large,Causal5 Macro-F1,-0.15,0.765290,False
+Original vs Channel-narrow,Causal5 Macro-F1,-0.44,0.033055,True
+Original vs Channel-wide,Causal5 Macro-F1,0.33,0.096236,False
