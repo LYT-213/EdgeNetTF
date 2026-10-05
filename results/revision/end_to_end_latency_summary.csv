@@ -1,0 +1,2 @@
+Mean_ms,Sample_SD_ms,Median_ms,P95_ms,Warmup_Runs,Timed_Runs,Device,Pipeline
+2.0322,0.1414,2.0131,2.2553,100,1000,Intel Xeon CPU 2.00 GHz (Kaggle),log compression + FFT + normalization + tensor conversion + model inference
