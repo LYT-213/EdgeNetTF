@@ -64,7 +64,7 @@ def main():
  fig,axes=plt.subplots(1,3,figsize=(15,4.6),constrained_layout=True)
  for ax,(title,feat),label in zip(axes,spaces,['(a)','(b)','(c)']):
   feat=StandardScaler().fit_transform(feat); emb=umap.UMAP(n_neighbors=30,min_dist=.1,metric='euclidean',random_state=42).fit_transform(feat)
-  sc=ax.scatter(emb[:,0],emb[:,1],c=z,s=6,cmap='turbo',alpha=.8); ax.set_title(f'{label} {title}'); ax.set_xticks([]); ax.set_yticks([])
+  sc=ax.scatter(emb[:,0],emb[:,1],c=z+1,s=6,cmap='turbo',alpha=.8); ax.set_title(f'{label} {title}'); ax.set_xticks([]); ax.set_yticks([])
  cbar=fig.colorbar(sc,ax=axes.tolist(),fraction=.025,pad=.02); cbar.set_label('Gesture class'); plt.savefig('EdgeNetTF_UMAP_S1.png',dpi=300,bbox_inches='tight')
 
 if __name__=='__main__': main()
